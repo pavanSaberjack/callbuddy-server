@@ -1,0 +1,10 @@
+.$Calbuddy.drawio.dtmp
+
+# Dependency directories
+node_modules/
+
+# credentials
+google-services/credentials.json
+google-services/token.json
+
+.vscode/
