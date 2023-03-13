@@ -53,7 +53,7 @@ async function saveCredentials(client) {
  * Load or request or authorization to call APIs.
  *
  */
-async function authorize() {
+async function authorize(emailId) {
   let client = await loadSavedCredentialsIfExist();
   if (client) {
     return client;
@@ -106,8 +106,8 @@ async function deleteEvent(eventId) {
   console.log(res.status);
 }
 
-async function getMyEvents() {
-  await authorize().then(listEvents).catch(console.error);
+async function getMyEvents(emailId) {
+  await authorize(emailId).then(listEvents).catch(console.error);
   return myEvents;
 }
 

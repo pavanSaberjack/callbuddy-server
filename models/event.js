@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 const googleServices = require('../third-party/google-calendar/google-calendar-services');
 
-const Attendee = require('./attendee');
+const db = require('../util/database');
 const events = [];
 
 module.exports = class Event {
@@ -27,13 +27,13 @@ module.exports = class Event {
         return memberListStr;
     }
 
-    static fetchAll(cb) {
+    static fetchAll() {
+
         // TODO: Temp fix to avoid calling APIs
         // if (events.length > 0) {
         //     return cb(events);
         // }
-
-        googleServices.getMyEvents().then((calendarEvents) => {
+        googleServices.getMyEvents('a@a.com').then((calendarEvents) => {
             calendarEvents.map((calendarEvent, i) => {
                 let title = calendarEvent.summary;
                 let eventId = calendarEvent.id;
@@ -46,7 +46,10 @@ module.exports = class Event {
                 events.push(event);
             });
             cb(events);
-        });   
+        });  
+
+
+        return db.execute('select * from events');  
     }
 
     static delete(eventId, cb) {
