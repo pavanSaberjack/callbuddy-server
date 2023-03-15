@@ -61,4 +61,22 @@ module.exports = class Event {
             Event.fetchAll(cb);             
         });
     }
+
+    static update(emailId, eventId, requiredMembers) {
+        const query = `UPDATE events SET requiredMembers="${requiredMembers}" WHERE emailId="${emailId} AND eventId="${eventId}"`;
+        return db.execute(query);
+    }
+
+    static create(emailId, eventId, requiredMembers) {
+        const query = `INSERT INTO events (eventId, requiredMembers, emailId) VALUES ("${eventId}", "${requiredMembers}", "${emailId}")`;
+        return db.execute(query);
+    }
+
+    static fetchAll(emailId) {
+        return db.execute(`SELECT * FROM events WHERE emailId='${emailId}'`);   
+    }
+
+    static fetch(emailId, eventId) {
+        return db.execute(`SELECT * FROM events WHERE emailId='${emailId}' AND eventId='${eventId}'`);
+    }
 }
