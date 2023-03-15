@@ -1,16 +1,20 @@
-const fs = require('fs').promises;
-const path = require('path');
-const process = require('process');
-const {authenticate} = require('@google-cloud/local-auth');
-const {google} = require('googleapis');
+const fs = require("fs").promises;
+const path = require("path");
+const process = require("process");
+const { authenticate } = require("@google-cloud/local-auth");
+const { google } = require("googleapis");
+const User = require("../../models/user");
 
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
+const SCOPES = ["https://www.googleapis.com/auth/calendar"];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = path.join(process.cwd(), 'google-services/token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'google-services/credentials.json');
+const TOKEN_PATH = path.join(process.cwd(), "google-services/token.json");
+const CREDENTIALS_PATH = path.join(
+  process.cwd(),
+  "google-services/credentials.json"
+);
 
 // storing the events locally
 const myEvents = [];
@@ -20,14 +24,15 @@ const myEvents = [];
  *
  * @return {Promise<OAuth2Client|null>}
  */
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
-    return null;
-  }
+async function loadSavedCredentialsIfExist(emailId) {
+  // We will consider that user is already created before we go for google auth.
+  User.fetch(emailId)
+    .then(([users, fieldData]) => {
+      const content = users[0]["googleAuthJSON"];
+      const credentials = JSON.parse(content);
+      return google.auth.fromJSON(credentials);
+    })
+    .catch((error) => console.log(error));
 }
 
 /**
@@ -36,17 +41,22 @@ async function loadSavedCredentialsIfExist() {
  * @param {OAuth2Client} client
  * @return {Promise<void>}
  */
-async function saveCredentials(client) {
+async function saveCredentials(client, emailId) {
   const content = await fs.readFile(CREDENTIALS_PATH);
   const keys = JSON.parse(content);
   const key = keys.installed || keys.web;
   const payload = JSON.stringify({
-    type: 'authorized_user',
+    type: "authorized_user",
     client_id: key.client_id,
     client_secret: key.client_secret,
     refresh_token: client.credentials.refresh_token,
   });
-  await fs.writeFile(TOKEN_PATH, payload);
+
+  User.update(emailId, payload)
+    .then((result) => {
+      return;
+    })
+    .catch((error) => console.log(error));
 }
 
 /**
@@ -54,7 +64,7 @@ async function saveCredentials(client) {
  *
  */
 async function authorize(emailId) {
-  let client = await loadSavedCredentialsIfExist();
+  let client = await loadSavedCredentialsIfExist(emailId);
   if (client) {
     return client;
   }
@@ -63,7 +73,7 @@ async function authorize(emailId) {
     keyfilePath: CREDENTIALS_PATH,
   });
   if (client.credentials) {
-    await saveCredentials(client);
+    await saveCredentials(client, emailId);
   }
   return client;
 }
@@ -73,17 +83,17 @@ async function authorize(emailId) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function listEvents(auth) {
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({ version: "v3", auth });
   const res = await calendar.events.list({
-    calendarId: 'primary',
+    calendarId: "primary",
     timeMin: new Date().toISOString(),
     maxResults: 10,
     singleEvents: true,
-    orderBy: 'startTime',
+    orderBy: "startTime",
   });
   const events = res.data.items;
   if (!events || events.length === 0) {
-    console.log('No upcoming events found.');
+    console.log("No upcoming events found.");
     return;
   }
   // myEvents.push(events);
@@ -98,10 +108,10 @@ async function listEvents(auth) {
 async function deleteEvent(eventId) {
   const auth = await authorize();
 
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({ version: "v3", auth });
   const res = await calendar.events.delete({
-    calendarId: 'primary',
-    eventId: eventId
+    calendarId: "primary",
+    eventId: eventId,
   });
   console.log(res.status);
 }
