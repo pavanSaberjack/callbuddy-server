@@ -5,6 +5,7 @@ const fs = require("fs").promises;
 const path = require("path");
 const process = require("process");
 
+const db = require('../../util/database');
 
 const CREDENTIALS_PATH = path.join(
     process.cwd(),
@@ -23,14 +24,6 @@ const oAuth2Client = new OAuth2Client(
     credentials.web.client_secret,
     credentials.web.redirect_uris[0]
 );
-
-// Create a new MySQL connection pool
-const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'password',
-  database: 'mydatabase',
-});
 
 // Authorize the OAuth2 client and retrieve the access token and refresh token
 async function authorize() {
@@ -65,22 +58,21 @@ async function getEvents() {
 
 // Connect to the MySQL database and insert the events
 async function insertEvents(events) {
-  const connection = await pool.getConnection();
   try {
-    await connection.beginTransaction();
+    await db.beginTransaction();
     const insertPromises = events.map((event) => {
       const sql = 'INSERT INTO events (name, start_time, end_time) VALUES (?, ?, ?)';
       const values = [event.summary, event.start.dateTime, event.end.dateTime];
-      return connection.query(sql, values);
+      return db.execute(sql, values);
     });
     await Promise.all(insertPromises);
-    await connection.commit();
+    await db.commit();
     console.log('Events inserted successfully!');
   } catch (error) {
-    await connection.rollback();
+    await db.rollback();
     console.error('Error inserting events:', error);
   } finally {
-    connection.release();
+    db.release();
   }
 }
 
