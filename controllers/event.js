@@ -1,8 +1,23 @@
 const Event = require('../models/event')
 
+const google = require('../third-party/google-calendar/google-calendar-services');
+
 exports.getEventsList = (req, res, next) => {
+
     const emailId = req.body.emailId;
     const eventId = req.body.eventId;
+
+    // google.generateAuthUrl(emailId)
+    //     .then((authUrl) => {
+    //         console.log(authUrl);
+
+    //         // res.redirect(authUrl);
+
+    //         res.status(200).json({
+    //             result: authUrl
+    //         });
+    // })
+    // .catch(error => console.log(error));
 
     if (eventId == null) {
         Event.fetchAll(emailId)

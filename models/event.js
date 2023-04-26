@@ -63,20 +63,20 @@ module.exports = class Event {
     }
 
     static update(emailId, eventId, requiredMembers) {
-        const query = `UPDATE events SET requiredMembers="${requiredMembers}" WHERE emailId="${emailId} AND eventId="${eventId}"`;
+        const query = `UPDATE event SET requiredMembers="${requiredMembers}" WHERE emailId="${emailId} AND eventId="${eventId}"`;
         return db.execute(query);
     }
 
     static create(emailId, eventId, requiredMembers) {
-        const query = `INSERT INTO events (eventId, requiredMembers, emailId) VALUES ("${eventId}", "${requiredMembers}", "${emailId}")`;
+        const query = `INSERT INTO event (eventId, requiredMembers, emailId) VALUES ("${eventId}", "${requiredMembers}", "${emailId}")`;
         return db.execute(query);
     }
 
     static fetchAll(emailId) {
-        return db.execute(`SELECT * FROM events WHERE emailId='${emailId}'`);   
+        return db.execute(`SELECT * FROM event WHERE emailId='${emailId}'`);   
     }
 
     static fetch(emailId, eventId) {
-        return db.execute(`SELECT * FROM events WHERE emailId='${emailId}' AND eventId='${eventId}'`);
+        return db.execute(`SELECT * FROM event WHERE emailId='${emailId}' AND eventId='${eventId}'`);
     }
 }

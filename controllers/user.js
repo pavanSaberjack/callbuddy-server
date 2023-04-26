@@ -13,6 +13,8 @@ exports.getUser = (req, res, next) => {
 };
 
 exports.updateUser = (req, res, next) => {    
+    console.log(req.body);
+
     const emailId = req.body.emailId;
     const googleAuthJSON = req.body.googleAuthJSON;
 
@@ -39,3 +41,9 @@ exports.updateUser = (req, res, next) => {
         })
         .catch(error => console.log(error));  
 };
+
+exports.redirect = (req, res, next) => {
+    
+    console.log('I am hereeeeeee')
+    res.redirect('com.googleusercontent.apps.177298629480-4ddd096opvtpbsf13t9gdktujkls99i9')
+}

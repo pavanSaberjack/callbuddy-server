@@ -4,16 +4,18 @@ const process = require("process");
 const { authenticate } = require("@google-cloud/local-auth");
 const { google } = require("googleapis");
 const User = require("../../models/user");
+const { authUrl } = require("./event-manager");
+const { OAuth2Client } = require('google-auth-library');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/calendar"];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = path.join(process.cwd(), "google-services/token.json");
+const TOKEN_PATH = path.join(process.cwd(), "third-party/google-calendar/token.json");
 const CREDENTIALS_PATH = path.join(
   process.cwd(),
-  "google-services/credentials.json"
+  "third-party/google-calendar/credentials1.json"
 );
 
 // storing the events locally
@@ -121,5 +123,29 @@ async function getMyEvents(emailId) {
   return myEvents;
 }
 
+async function generateAuthUrl(emailId) {
+  console.log(CREDENTIALS_PATH);
+  const content = await fs.readFile(CREDENTIALS_PATH);
+  const keys = JSON.parse(content);
+  const key = keys.installed || keys.web;
+  
+  console.log(key);
+
+  const client = new OAuth2Client({
+    clientId: key.client_id,
+    clientSecret: key.client_secret,
+    redirectUri: key.redirect_uris[0]
+  });
+  
+  // Generate a URL for the user to authorize the app
+  const authUrl = client.generateAuthUrl({
+    access_type: 'offline',
+    scope: SCOPES
+  });
+
+  return authUrl;
+}
+
+exports.generateAuthUrl = generateAuthUrl;
 exports.getMyEvents = getMyEvents;
 exports.deleteEvent = deleteEvent;

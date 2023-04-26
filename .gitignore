@@ -8,3 +8,5 @@ third-party/Google-calendar/credentials.json
 third-party/google-calendar/token.json
 
 .vscode/
+
+.DS_Store
