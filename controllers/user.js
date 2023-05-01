@@ -16,12 +16,14 @@ exports.updateUser = (req, res, next) => {
     console.log(req.body);
 
     const emailId = req.body.emailId;
-    const googleAuthJSON = req.body.googleAuthJSON;
+    const idToken = req.body.idToken;
 
+    // fetch user from db
     User.fetch(emailId)
-        .then(([users, fieldData]) => {
+        .then(([users, fieldData]) => {            
             if (users.length > 0) {            
-                User.update(emailId, googleAuthJSON)
+                // If user exists, update the user
+                User.update(emailId, idToken)
                     .then((result) => {
                         res.status(200).json({
                             result: "Success"
@@ -30,7 +32,7 @@ exports.updateUser = (req, res, next) => {
                     .catch(error => console.log(error))                
             } else {
                 // create a new user
-                User.create(emailId, googleAuthJSON)
+                User.create(emailId, idToken)
                     .then((result) => {
                         res.status(200).json({
                             result: "user created"
