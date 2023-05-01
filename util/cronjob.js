@@ -16,11 +16,13 @@ class CronJob {
     }
 }
 
-function myFunction() {
-    // Fetch all events from database
-    // Check if event is in the next 30 mins
-    // If yes, send notification to all users
-    // If no, do nothing
+function manageUpcomingEvents() {
+    // Fetch all events from Google Calendar
+    // For each event, check if the event is in the database and user can cancel the invite
+    // If exists in database, check if required members are have accepted the invite
+    // If not, send a reminder email to the required members
+    // If not accepted and meeting is next 4 hours then cancel the call
+
 
     Event.fetchAll("x@x.com")
         .then(([events, fieldData]) => {
@@ -30,15 +32,6 @@ function myFunction() {
             });
         })
         .catch(error => console.log(error));
-
-
-    // Event.fetchAll ((events) => {
-    //     console.log(events);
-
-    //     events.map((event, i) => {
-    //         console.log(event);
-    //     });
-    // });
     
     console.log("This function runs every 30 secs.");
 }
@@ -50,7 +43,7 @@ module.exports = class EventCronJob {
     }
 
     start() {        
-        const job = new CronJob(myFunction, 0.1 * 60 * 1000);
+        const job = new CronJob(manageUpcomingEvents, 0.1 * 60 * 1000);
 
         this.manager.addJob(job);
         this.manager.startAll();
