@@ -11,10 +11,10 @@ module.exports = class User {
         return db.execute(query);
     }
 
-    static update(emailId, accessToken, refreshToken) {
-        const query = `UPDATE user SET accessToken="${accessToken}, refreshToken="${refreshToken}" WHERE emailId="${emailId}"`;
-        return db.execute(query);
-    }
+    // static update(emailId, accessToken, refreshToken) {
+    //     const query = `UPDATE user SET accessToken="${accessToken}, refreshToken="${refreshToken}" WHERE emailId="${emailId}"`;
+    //     return db.execute(query);
+    // }
 
     static create(emailId, idToken) {
         const query = `INSERT INTO user (emailId, idToken) VALUES ("${emailId}", "${idToken}")`;
