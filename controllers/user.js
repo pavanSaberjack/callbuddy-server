@@ -17,13 +17,15 @@ exports.updateUser = (req, res, next) => {
 
     const emailId = req.body.emailId;
     const idToken = req.body.idToken;
+    const refreshToken = req.body.refreshToken;
+    const accessToken = req.body.accessToken;
 
     // fetch user from db
     User.fetch(emailId)
         .then(([users, fieldData]) => {            
             if (users.length > 0) {            
                 // If user exists, update the user
-                User.update(emailId, idToken)
+                User.update(emailId, idToken, refreshToken, accessToken)
                     .then((result) => {
                         res.status(200).json({
                             result: "Success"
@@ -32,7 +34,7 @@ exports.updateUser = (req, res, next) => {
                     .catch(error => console.log(error))                
             } else {
                 // create a new user
-                User.create(emailId, idToken)
+                User.create(emailId, idToken, refreshToken, accessToken)
                     .then((result) => {
                         res.status(200).json({
                             result: "user created"

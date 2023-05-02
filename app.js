@@ -19,6 +19,6 @@ app.use(eventRouter);
 app.use(userRouter);
 
 const eventJob = new EventCronJob();
-// eventJob.start();
+eventJob.start();
 
 app.listen(8080);

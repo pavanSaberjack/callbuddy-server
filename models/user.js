@@ -6,8 +6,8 @@ module.exports = class User {
         this.googleAuthJSON = googleAuthJSON
     }
 
-    static update(emailId, idToken) {
-        const query = `UPDATE user SET idToken="${idToken}" WHERE emailId="${emailId}"`;
+    static update(emailId, idToken, refreshToken, accessToken) {
+        const query = `UPDATE user SET idToken="${idToken}", refreshToken="${refreshToken}", accessToken="${accessToken}" WHERE emailId="${emailId}"`;
         return db.execute(query);
     }
 
@@ -16,12 +16,21 @@ module.exports = class User {
     //     return db.execute(query);
     // }
 
-    static create(emailId, idToken) {
-        const query = `INSERT INTO user (emailId, idToken) VALUES ("${emailId}", "${idToken}")`;
+    static create(emailId, idToken, refreshToken, accessToken) {
+
+        const query = `INSERT INTO user (emailId, idToken, refreshToken, accessToken) VALUES ("${emailId}", "${idToken}", "${refreshToken}", "${accessToken}")`;
         return db.execute(query);
     }
 
     static fetch(emailId) {
         return db.execute(`SELECT * FROM user WHERE emailId='${emailId}'`);   
+    }
+
+    static fetchToken(emailId) {
+        return db.execute(`SELECT idToken FROM user WHERE emailId='${emailId}'`);   
+    }
+
+    static fetchAll() {
+        return db.execute('SELECT * FROM user');
     }
 }

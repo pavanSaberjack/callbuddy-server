@@ -4,7 +4,6 @@ const process = require("process");
 const { authenticate } = require("@google-cloud/local-auth");
 const { google } = require("googleapis");
 const User = require("../../models/user");
-const { authUrl } = require("./event-manager");
 const { OAuth2Client } = require('google-auth-library');
 
 // If modifying these scopes, delete token.json.
